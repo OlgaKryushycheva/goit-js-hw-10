@@ -1,76 +1,110 @@
 import Notiflix from 'notiflix';
 
+const searchInputEl = document.querySelector('#search-box');
+const countryListEl = document.querySelector('.country-list');
+const countryInfoEl = document.querySelector('.country-info');
+
 const BASE_URL = 'https://restcountries.com/v3.1/name/';
-// const PARAMS = 'fields=${countryName},capital,population,languages,flag';
 
 export function fetchCountries(countryName) {
   fetch(
     `${BASE_URL}${countryName}?fields=name,capital,population,languages,flags&&fullText=false`
-  ).then(response => {
-    if (!response.ok) {
-      // throw new Error(response.status);
-      throw Notiflix.Notify.failure('Oops, there is no country with that name');
-    }
-    console.log(response.json());
-    return response.json();
-  });
-  // .then(data => {
-  //   if (data.length > 10) {
-  //     throw Notiflix.Notify.info(
-  //       `Too many matches found. Please enter a more specific name.`
-  //     );
-  //   }
-  //   console.log(data);
-  //   // console.log(...data);
-  //   const dataObj = data[0];
-  //   console.log(dataObj);
-  //   console.log(dataObj.name.official);
-  //   console.log(dataObj.flags.svg);
-  //   console.log(...dataObj.capital);
-  //   console.log(Object.values(dataObj.languages).join(', '));
-  //   console.log(dataObj.population);
-  // })
-  // .catch(error => {
-  //   console.log(error);
-  // });
+  )
+    .then(response => {
+      if (!response.ok) {
+        throw Notiflix.Notify.failure(
+          'Oops, there is no country with that name'
+        );
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.length > 10) {
+        throw Notiflix.Notify.info(
+          `Too many matches found. Please enter a more specific name.`
+        );
+      } else if (data.length > 1 && data.length <= 10) {
+        countryInfoEl.innerHTML = '';
+
+        let countryCollectionArr = [];
+        let countryCollection;
+
+        for (let i = 0; i < data.length; i++) {
+          let name = data[i].name.official;
+          let flag = data[i].flags.svg;
+
+          const markupCountryList = ` <li class="country-item">
+          <img
+            src="${flag}"
+            alt="flag"
+            width="25"
+            height="20"
+          />
+          <p class="country-name">${name}</p>
+        </li>`;
+
+          countryCollectionArr.push(markupCountryList);
+          countryCollection = countryCollectionArr.join('');
+        }
+
+        countryListEl.innerHTML = countryCollection;
+      } else {
+        countryListEl.innerHTML = '';
+
+        let dataSity = data[0];
+        let name = dataSity.name.official;
+        let flag = dataSity.flags.svg;
+        let capital = dataSity.capital[0];
+        let languages = Object.values(dataSity.languages).join(', ');
+        let population = dataSity.population;
+
+        const markupCountryInfo = `<div class="country-title">
+          <img
+            src="${flag}"
+            alt="flag"
+            width="30"
+            height="25"
+          />
+          <p>${name}</p>
+        </div>
+        <p class="country-descr">
+          <span class="country-field">Capital: </span>${capital}
+        </p>
+        <p class="country-descr">
+          <span class="country-field">Population: </span>${population}
+        </p>
+        <p class="country-descr">
+          <span class="country-field">Languages: </span>${languages}
+        </p>`;
+        countryInfoEl.innerHTML = markupCountryInfo;
+      }
+    })
+    .catch(error => {
+      console.log(error);
+    });
 }
 
-// https://restcountries.com/v3.1/all?fields=name,capital,currencies
+// =============================
+// function makeCountryInfo({ flag, name, capital, population, languages }) {
+//   ` <div class="country-title">
+//         <img
+//           src="${flag}"
+//           alt="flag"
+//           width="25"
+//           height="20"
+//         />
+//         <p>${name}</p>
+//       </div>
 
-//https: restcountries.eu/rest/v2/all?fields=name;capital;currencies
-// https://restcountries.eu/rest/v2/{service}?fields={field};{field};{field}
-// name;
-// capital;
-// population;
-// languages;
-// flag;
+//       <p class="country-descr">
+//         <span class="country-field">Capital: </span>${capital}
+//       </p>
+//       <p class="country-descr">
+//         <span class="country-field">Population: </span>${population}
+//       </p>
+//       <p class="country-descr">
+//         <span class="country-field">Languages: </span>${languages}
+//       </p>`;
 
-// const searchParams = new URLSearchParams({
-//   _limit: 10,
-//   // _sort: 'name',
-//   _name: 'name.official',
-//   _capital: '',
-//   _population: 0,
-//   _languages: [],
-//   _flag: 'flags.svg',
-// });
-
-// console.log(searchParams.toString()); // "_limit=5&_sort=name"
-
-// const url = `https://jsonplaceholder.typicode.com/users?${searchParams}`;
-// console.log(url); // "https://jsonplaceholder.typicode.com/users?_limit=5&_sort=name"
-
-// fetch('https://jsonplaceholder.typicode.com/users')
-//   .then(response => {
-//     if (!response.ok) {
-//       throw new Error(response.status);
-// throw Notiflix.Notify.failure('Oops, there is no country with that name');
-//     }
-//     return response.json();
-//   })
-//   .then(data => {
-//     // Data handling
-//   })
-//   .catch(error => {
-//     // Error handling
-//   });
+//   // countryInfoEl.innerHTML = markupCountryInfo;
+// }
