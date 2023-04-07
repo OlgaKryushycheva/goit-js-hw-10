@@ -90,7 +90,7 @@ function onSearchCountry() {
   }
 }
 
-function clearRander() {
+export function clearRander() {
   countryListEl.innerHTML = '';
   countryInfoEl.innerHTML = '';
 }
